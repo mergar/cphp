@@ -2,12 +2,12 @@
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
-\Sentry\init([
-  'dsn' => 'http://c65113565bd37b2d04714ca80036d536@sentry.convectix.com/2',
-  // Add request headers, cookies and IP address,
-  // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
-  'send_default_pii' => true,
-]);
+//\Sentry\init([
+//  'dsn' => 'http://c65113565bd37b2d04714ca80036d536@sentry.convectix.com/2',
+//  // Add request headers, cookies and IP address,
+//  // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
+//  'send_default_pii' => true,
+//]);
 
 
 class CBSD extends ClonOS {
@@ -20,10 +20,14 @@ class CBSD extends ClonOS {
 			'{cbsd_loc}' => "/usr/local/bin/cbsd"
 		);
 
+		// descriptor_spec:
+		// 0 - stdin  (parent writes, child reads)
+		// 1 - stdout (child writes, parent reads)
+		// 2 - stderr (child writes, parent reads)
 		$specs = array(
 			0 => array('pipe','r'),
 			1 => array('pipe','w'),
-			2 => array('pipe','r')
+			2 => array('pipe','w')
 		);
 
 		$cmd = vsprintf($cmd, $args); # make sure we deal with a string
@@ -44,18 +48,21 @@ class CBSD extends ClonOS {
 		$error_message='';
 		$message='';
 		if (is_resource($process)){
-			$buf=stream_get_contents($pipes[1]);
-			$buf0=stream_get_contents($pipes[0]);
-			$buf1=stream_get_contents($pipes[2]);
+			// read stdout
+			$buf = stream_get_contents($pipes[1]);
+			// read stderr
+			$buf_err = stream_get_contents($pipes[2]);
 			fclose($pipes[0]);
 			fclose($pipes[1]);
 			fclose($pipes[2]);
 
 			$task_id=-1;
 			$return_value = proc_close($process);
-			if($return_value==0) $message=trim($buf); else {
+			if($return_value==0) {
+				$message=trim($buf);
+			} else {
 				$error=true;
-				$error_message=$buf;
+				$error_message = $buf_err !== '' ? $buf_err : $buf;
 			}
 
 //			ClonOS::clonos_syslog("cmd.php:"."ret:".$return_value." msg:[".$message."] "."error:[".$error."] "."error_message:[".$error_message." ]");

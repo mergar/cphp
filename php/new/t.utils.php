@@ -23,3 +23,13 @@ trait tUtils {
 
 
 }
+
+// Helper: return first element of an array (or null if empty)
+if (!function_exists('array_first')) {
+	function array_first(array $array) {
+		foreach ($array as $value) {
+			return $value;
+		}
+		return null;
+	}
+}

@@ -2,12 +2,12 @@
 
 require_once __DIR__ . '../../vendor/autoload.php';
 
-\Sentry\init([
-  'dsn' => 'http://c65113565bd37b2d04714ca80036d536@sentry.convectix.com/2',
-  // Add request headers, cookies and IP address,
-  // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
-  'send_default_pii' => true,
-]);
+//\Sentry\init([
+//  'dsn' => 'http://c65113565bd37b2d04714ca80036d536@sentry.convectix.com/2',
+//  // Add request headers, cookies and IP address,
+//  // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
+//  'send_default_pii' => true,
+//]);
 
 
 class CBSD {
