@@ -1,0 +1,15 @@
+media_import/*.img
+media_import/*.size
+logs/*.log
+logs/*.err
+clonos/node/node_modules/*
+public/media/*.iso
+public/media/*.img
+public/media/*.size
+composer.lock
+php/sentry.php
+php/vendor
+_translate.cache
+media_import
+__pycache__
+vendor

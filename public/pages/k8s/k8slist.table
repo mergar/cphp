@@ -1,0 +1,13 @@
+	<tbody>
+		<tr class="#nth-num#<!--#maintenance#-->" id="#name#">
+			<td class="txtleft">#name#</td>
+			<td class="txtleft wordwreck node">#cluster#</td>
+			<td class="txtcenter">#masters#</td>
+			<td class="txtcenter">#workers#</td>
+			<td class="txtleft">#bhyves#</td>
+			<td class="ops"><span class="icon-cnt"><span class="icon-#icon#"></span></span></td>
+			<td class="op-settings"><span class="icon-cog"></span></td>
+			<td class="op-reboot" title="#reboot_title#"><span class="icon-arrows-cw"></span></td>
+			<td class="op-del"#protitle#><span class="icon-cancel"></span></td>
+		</tr>
+	</tbody>
