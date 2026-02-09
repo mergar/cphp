@@ -1,21 +1,22 @@
 <?php
 
-require_once __DIR__ . '../../../vendor/autoload.php';
+require_once __DIR__ . '../../../../vendor/autoload.php';
 
-//\Sentry\init([
-//  'dsn' => 'http://c65113565bd37b2d04714ca80036d536@sentry.convectix.com/2',
-//  // Add request headers, cookies and IP address,
-//  // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
-//  'send_default_pii' => true,
-//]);
+\Sentry\init([
+  'dsn' => 'http://c65113565bd37b2d04714ca80036d536@sentry.convectix.com/2',
+  // Add request headers, cookies and IP address,
+  // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
+  'send_default_pii' => true,
+]);
 
 
 class CBSD extends ClonOS {
 
 	static function run($cmd, $args){
 
-		// olevole
-		$prepend='env NOCOLOR=1 /usr/bin/sudo /usr/local/bin/cbsd ';
+
+		// todo: support for /usr/local/www/clonos/php/config-extcmd.php macros/vars
+		$prepend='env NOCOLOR=1 /usr/local/bin/sudo /usr/local/bin/cbsd ';
 		$defines = array(
 			'{cbsd_loc}' => "/usr/local/bin/cbsd"
 		);
