@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/root/bin"
 # Copyright (C) 2018 The noVNC authors
 # Licensed under MPL 2.0 or any later version (see LICENSE.txt)
 
@@ -190,7 +189,7 @@ else
     if [ ! -f "$WEBSOCKIFY" ]; then
         echo "No installed websockify, attempting to clone websockify..."
         WEBSOCKIFY=${HERE}/websockify/run
-        git clone https://github.com/novnc/websockify ${HERE}/websockify
+        /usr/local/bin/git clone https://github.com/novnc/websockify ${HERE}/websockify
 
         if [[ ! -e $WEBSOCKIFY ]]; then
             echo "Unable to locate ${HERE}/websockify/run after downloading"

@@ -7,7 +7,7 @@
 
 "use strict";
 
-import fs from 'fs';
+const fs = require('fs');
 
 let showHelp = process.argv.length === 2;
 let filename;
