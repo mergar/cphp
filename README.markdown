@@ -303,7 +303,7 @@ h) Init web user database:
 
 ```
 cbsd clonosdb
-su www -c 'php /usr/local/www/clonos/php/new/_setup.php'
+sudo -u www php /usr/local/www/clonos/php/new/_setup.php
 ```
 
 i) Configure and run CBSD RACCT stats daemon:
