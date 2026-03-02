@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+set -e
+cd "$(dirname "$0")"
+exec python3 -m websockify "$@"
