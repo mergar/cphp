@@ -27,7 +27,7 @@ var clonos={
 		'bremove':{stat:['Remove','Removing','Removed'],cmd:'bhyveRemove'},
 		'bclone':{stat:['Clone','Cloning','Cloned'],cmd:'bhyveClone'},
 		'brename':{stat:['Rename','Renaming','Renamed'],cmd:'bhyveRename'},
-		'vm_obtain':{stat:['Create','Creating','Created'],cmd:'bhyveObtain'},
+		'vm_cloud':{stat:['Create','Creating','Created'],cmd:'bhyveCloud'},
 		'srcup':{stat:['Update','Updating','Updated'],cmd:'srcUpdate'},
 		'world':{stat:['Compile','Compiling','Compiled'],cmd:'basesCompile'},
 		'repo':{stat:['Fetch','Fetching','Fetched'],cmd:'repoCompile'},
@@ -316,7 +316,7 @@ var clonos={
 				this.getFreeJname();	// Берём с сервера свободное имя клетки
 				this.trids=this.getTrIdsForCheck('jailslist');
 			}
-			if(id=='bhyve-new')
+			if(id=='bhyve-iso')
 			{
 				this.trids=this.getTrIdsForCheck('bhyveslist');
 				this.updateBhyveISO();
@@ -324,11 +324,11 @@ var clonos={
 				if(typeof this.vm_packages_new_min_id!='undefined')
 					$('#bhyveSettings select[name="vm_packages"]').val(this.vm_packages_new_min_id).change();
 			}
-			if(id=='bhyve-obtain')
+			if(id=='bhyve-cloud')
 			{
-				this.getObtainFormItems();	// Берём с сервера свободное имя виртуалки и min/max ram/cpus
+				this.updateBhyveCloud();	// Берём с сервера свободное имя виртуалки и min/max ram/cpus
 				if(typeof this.vm_packages_obtain_min_id!='undefined')
-					$('#bhyveObtSettings select[name="vm_packages"]').val(this.vm_packages_obtain_min_id).change();
+					$('#bhyveCloudSettings select[name="vm_packages"]').val(this.vm_packages_obtain_min_id).change();
 			}
 			if(id=='k8s-new')
 			{
@@ -613,7 +613,7 @@ var clonos={
 				posts.push({'name':'oldJail','value':this.renamedOldName});
 				this.loadData('bhyveRename',$.proxy(this.onJailAdd,this),posts);
 			}
-			if(id=='bhyve-new' && $('form#bhyveSettings').length>0)
+			if(id=='bhyve-iso' && $('form#bhyveSettings').length>0)
 			{
 				this.storageBhyveOSProfile();
 				var jid=$('form#bhyveSettings input[name="vm_name"]').val();
@@ -642,13 +642,13 @@ var clonos={
 				var bmode=(mode=='edit'?'bhyveEdit':'bhyveAdd');
 				this.loadData(bmode,$.proxy(this.onJailAdd,this),posts);
 			}
-			if(id=='bhyve-obtain' && $('form#bhyveObtSettings').length>0)
+			if(id=='bhyve-cloud' && $('form#bhyveCloudSettings').length>0)
 			{
-				var jid=$('form#bhyveObtSettings input[name="vm_name"]').val();
+				var jid=$('form#bhyveCloudSettings input[name="vm_name"]').val();
 				this.tmp_jail_info[jid]={};
 				this.tmp_jail_info[jid]['runasap']=0;	// исправить на реальные данные!
-				var posts=$('form#bhyveObtSettings').serializeArray();
-				this.loadData('bhyveObtain',$.proxy(this.onJailAdd,this),posts);
+				var posts=$('form#bhyveCloudSettings').serializeArray();
+				this.loadData('bhyveCloud',$.proxy(this.onJailAdd,this),posts);
 			}
 			if(id=='bhyve-clone')
 			{
@@ -803,9 +803,9 @@ var clonos={
 						var table='bhyveslist';
 						var operation='bcreate';
 						break;
-					case 'bhyveObtain':	this.dialogClose();return;
+					case 'bhyveCloud':	this.dialogClose();return;
 						var table='bhyveslist';
-						var operation='vm_obtain';
+						var operation='vm_cloud';
 						break;
 					case 'basesCompile':	this.dialogClose();return;
 						var table='baseslist';
@@ -1120,38 +1120,38 @@ var clonos={
 		this.wssReload();
 		this.dataReload();
 	},
-	getObtainFormItems:function()
+	updateBhyveCloud:function()
 	{
-		this.formDisable($('form#bhyveObtSettings'));
-		this.loadData('getObtainFormItems',$.proxy(this.onGetObtainFormItems,this));
+		this.formDisable($('form#bhyveCloudSettings'));
+		this.loadData('updateBhyveCloud',$.proxy(this.onUpdateBhyveCloud,this));
 	},
-	onGetObtainFormItems:function(data)
+	onUpdateBhyveCloud:function(data)
 	{
-		//#bhyveObtSettings
+		//#bhyveCloudSettings
 		if(typeof data.form_items!='undefined')
 		{
 			var fi=data.form_items;
-			$('#bhyveObtSettings input[name="vm_name"]').val(fi.jname);
+			$('#bhyveCloudSettings input[name="vm_name"]').val(fi.jname);
 			
-			$('#bhyveObtSettings input[name="vm_cpus"]').prop({
+			$('#bhyveCloudSettings input[name="vm_cpus"]').prop({
 				'min':fi.vm_cpus.min,
 				'max':fi.vm_cpus.max
 			}).val(fi.vm_cpus.cur);
-			$('#bhyveObtSettings input[name="vm_cpus_show"]').val(fi.vm_cpus.cur);
+			$('#bhyveCloudSettings input[name="vm_cpus_show"]').val(fi.vm_cpus.cur);
 			
-			$('#bhyveObtSettings input[name="vm_ram"]').prop({
+			$('#bhyveCloudSettings input[name="vm_ram"]').prop({
 				'min':fi.vm_ram.min,
 				'max':fi.vm_ram.max
 			}).val(fi.vm_ram.cur);
-			$('#bhyveObtSettings input[name="vm_ram_show"]').val(fi.vm_ram.cur+'g');
+			$('#bhyveCloudSettings input[name="vm_ram_show"]').val(fi.vm_ram.cur+'g');
 
-			$('#bhyveObtSettings input[name="vm_size"]').prop({
+			$('#bhyveCloudSettings input[name="vm_size"]').prop({
 				'min':fi.imgsize.min,
 				'max':fi.imgsize.max
 			}).val(fi.imgsize.cur);
-			$('#bhyveObtSettings input[name="vm_imgsize_show"]').val(fi.imgsize.cur+'g');
+			$('#bhyveCloudSettings input[name="vm_imgsize_show"]').val(fi.imgsize.cur+'g');
 		}
-		this.formEnable($('form#bhyveObtSettings'));
+		this.formEnable($('form#bhyveCloudSettings'));
 	},
 	
 	loadData:function(mode,return_func,arr,spinner)
@@ -1162,9 +1162,31 @@ var clonos={
 		var posts={'mode':mode,'path':location.pathname,'hash':window.location.hash,'db_path':db_path};
 		if(typeof arr=='object')
 		{
-			posts['form_data']={};
+			if(isAssocArray(arr))
+			{
+				posts['form_data']=arr;
+			}else{
+				posts['form_data']={};
+				for(n=0,nl=arr.length;n<nl;n++)
+				{
+					for(key in arr[n])
+					{
+						if(key=='name'){
+							posts['form_data'][arr[n][key]]=arr[n]['value'];
+							break;
+						}else{
+							posts['form_data'][key]=arr[n][key];
+						}
+					}
+				}
+			}
+			/*
 			for(n=0,nl=arr.length;n<nl;n++)
+			{
 				posts['form_data'][arr[n]['name']]=arr[n]['value'];
+			}
+			*/
+				
 		}
 		$.post(path,posts,
 			$.proxy(function(data){this.onLoadDataAuthorize(return_func,data);$('.spinner').hide();},this)	//return_func(data)
@@ -1401,13 +1423,14 @@ var clonos={
 		if($(icon).hasClass('icon-stop')) op=op2;	//'jstop';
 		this.enableWait(id);
 		
+		var emul=$(obj).data('emul');
 //		var op_status=(op==op1?1:0);	//'jstart'
 		
 		if(op!='')
 		{
 			//this.tasks.add({'operation':op,'jail_id':id});
 			//this.tasks.start();
-			var posts=[{'name':'operation','value':op},{'name':'jname','value':id}];
+			var posts={'operation':op, 'jname':id, 'emulator':emul};
 			if(typeof this.commands[op]!='undefined')
 			{
 				this.loadData(this.commands[op]['cmd'],$.proxy(this.onJailStart,this),posts,false);
@@ -1426,7 +1449,9 @@ var clonos={
 		var c=confirm(this.translate('You want to restart selected '+txt+'! Are you sure?'));
 		if(!c) return;
 		this.enableWait(id);
-		var posts=[{'name':'operation','value':op},{'name':'jname','value':id}];
+		
+		var emul=$(obj).data('emul');
+		var posts={'operation':op, 'jname':id, 'emulator':emul};
 		if(typeof this.commands[op]!='undefined')
 		{
 			this.loadData(this.commands[op]['cmd'],$.proxy(this.onJailStart,this),posts,false);
@@ -1679,7 +1704,7 @@ var clonos={
 			this.notify(task.errmsg,'error');
 			
 		//	Если ошибка при создании новой записи в таблице, то удаляем её через N секунд
-			if(['bcreate','vm_obtain','srcup'].indexOf(task.operation)!=-1)
+			if(['bcreate','vm_cloud','srcup'].indexOf(task.operation)!=-1)
 			{
 				setTimeout(function(id){$('#'+clonos.dotEscape(id)).remove();},5000,id);
 			}
@@ -1688,7 +1713,7 @@ var clonos={
 			{
 				case 'jcreate':
 				case 'bcreate':
-				case 'vm_obtain':
+				case 'vm_cloud':
 				case 'jclone':
 				case 'bclone':
 					var disp='s-off';
@@ -2412,6 +2437,28 @@ var clonos={
 				$('input[name="vm_imgsize_show"]',par).val(res[3]);
 		}
 	},
+	onChangeEngine:function(obj,event)
+	{
+		var frm=$(obj).closest('form');
+		$('select[name="profile"]',frm).addClass('hidden').prop('disabled',true);
+		var optsel=$("option:selected",obj);
+		var val=optsel.val();
+		$('#p-'+val,frm).removeClass('hidden').prop('disabled',false).trigger('change');
+	},
+	onChangeProfile:function(obj,event)
+	{
+		var frm=$(obj).closest('form');
+		var optsel=$("option:selected",obj);
+		var profile=optsel.val();
+		var res=optsel.data();
+		
+		var engine=$('select[name="engine"] option:selected',frm).val();
+		
+		var cloud='';
+		if($(frm).attr('id')=='bhyveCloudSettings') cloud='cloud';
+		var posts={'vmOsProfile':res['jname'], 'engine':engine, 'profile':profile, 'cloud':cloud};
+		this.loadData('vmOsInfo',$.proxy(this.onVmOsInfoLoad,this),posts);
+	},
 	onChangeOsProfile:function(obj,event)
 	{
 		var frm=$(obj).closest('form');
@@ -2419,15 +2466,15 @@ var clonos={
 		var val=$(obj).val();
 		var txt=$("option:selected",obj).text();
 		
-		var obtain='';
-		if($(frm).attr('id')=='bhyveObtSettings') obtain='obtain';
-		var posts=[{'name':'vmOsProfile','value':txt},{'name':'obtain','value':obtain}];
+		var cloud='';
+		if($(frm).attr('id')=='bhyveCloudSettings') cloud='cloud';
+		var posts=[{'name':'vmOsProfile','value':txt},{'name':'cloud','value':cloud}];
 		this.loadData('vmOsInfo',$.proxy(this.onVmOsInfoLoad,this),posts);
 	},
 	onVmOsInfoLoad:function(data)
 	{
 		var fi=data.form_items;
-		if(fi.obtain=='obtain') return this.onGetObtainFormItems(data);
+		if(fi.cloud=='cloud') return this.onUpdateBhyveCloud(data);
 		var obj=$('form#bhyveSettings');
 		$('input[name="vm_name"]',obj).val(fi.jname);
 		
@@ -2590,15 +2637,18 @@ var clonos={
 		$(tr).addClass('sel');
 		var coords=$(td).position();
 		var menu=$('div#config-menu');
-		var ccoords=$('div#content').position();
+		//var ccoords=$('div#content').position();
+		var ccoords=$('span.icon-cog',td).position();
 		var lpad=parseInt($(td).css('padding-left'),10);
 		var tpad=parseInt($(td).css('padding-top'),10);
 		if(menu.length>0)
 		{
 			/* # пересмотреть расчёт верхнего левого угла меню */
 			$(menu).css({
-				'left':coords.left+lpad/2-3,
-				'top':coords.top+$('div#content').scrollTop()+tpad+$('.tsimple').position().top,
+//				'left':coords.left+lpad/2-3,
+//				'top':coords.top+$('div#content').scrollTop()+tpad+$('.tsimple').position().top,
+				left:ccoords.left-9,	// + window.scrollX
+				top:ccoords.top-3,		// + window.scrollY
 				'display':'block',
 			});
 		}
@@ -2692,7 +2742,7 @@ var clonos={
 				switch(elid)
 				{
 					case 'jddm-edit':
-						var dialog='bhyve-new';
+						var dialog='bhyve-iso';
 						var mode='bhyveEditVars';
 						preloadVars=true;
 						this.cnt_mode='edit';
@@ -2752,8 +2802,8 @@ var clonos={
 		
 		var dialog=data.dialog;
 		this.fillDialogVars(dialog,data.vars);
-		if(data.dialog=='bhyve-new' && typeof data.iso_list!='undefined')
-			$('dialog#bhyve-new select[name="vm_iso_image"]').html(data.iso_list);
+		if(data.dialog=='bhyve-iso' && typeof data.iso_list!='undefined')
+			$('dialog#bhyve-iso select[name="vm_iso_image"]').html(data.iso_list);
 		this.dialogShow1(dialog,this.cnt_mode);
 		
 /*
@@ -3061,6 +3111,7 @@ var clonos={
 	
 	notify:function(message,type,timeout)
 	{
+		return;
 	//	alert, success, warning, error, information
 		if(typeof type=='undefined') type='warning';
 		if(typeof timeout=='undefined') timeout=5000;
@@ -3281,7 +3332,7 @@ var clonos={
 				break;
 			case 'jcreate':
 			case 'bcreate':
-			case 'vm_obtain':
+			case 'vm_cloud':
 			case 'jclone':
 			case 'bclone':
 			case 'jexport':
@@ -4113,6 +4164,8 @@ graph.prototype.create=function()
 /* === GRAPH END === */
 
 function isset(varr){for(a in arguments){if(typeof arguments[a]=='undefined')return false;}return true;}
+
+function isAssocArray(variable){return typeof variable === 'object' && variable !== null && !Array.isArray(variable);}
 
 function ws_debug(){
 	var res=prompt('Введите JSON строку','');

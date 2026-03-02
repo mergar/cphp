@@ -393,4 +393,89 @@ class Config extends ClonOS
 		}
 		return array('html'=>$html,'min_id'=>$min_id);
 	}
+	
+	
+	function getOsProfile($form=[],$cloud='')
+	{
+		if(!isset($form['profile']))
+		{
+			//$form=[];
+			$eng=array_first(ClonOS::$engines);
+			$form['engine']=$eng['name'];
+			if(!isset($form['cloud'])) $form['cloud']='';
+			if($cloud=='cloud')
+			{
+				foreach($eng['data'] as $key=>$val)
+				{
+					if(@$val['is_cloud']=='1')
+					{
+						$form['profile']=$key;
+						break;
+					}
+				}
+			}else{
+				$form['profile']=array_key_first($eng['data']);
+			}
+		}
+		
+		if(!isset($form['profile'])) return false;
+		
+		$profile=$form['profile'];
+		if(isset($form['engine']) && isset(ClonOS::$engines[$form['engine']]))
+		{
+			$engine=$form['engine'];
+			$eng=ClonOS::$engines[$engine];
+			$vars=$eng['data'][$profile];
+		}else{
+			$eng=array_first(ClonOS::$engines);
+			$vars=$eng['data'][$profile];
+		}
+		
+		$keys=['vm_cpus_min','vm_cpus_max','imgsize_min','imgsize_max','vm_ram_min','vm_ram_max'];
+		foreach($keys as $key)
+		{
+			if(!isset($vars[$key]))
+				$vars[$key]=$eng[$key];
+		}
+		return $vars;
+	}
+	
+	function getEnginesList($type='')
+	{
+		if(empty(ClonOS::$engines))
+		{
+			return "<div>Engines is not configured!</div>";
+		}
+		
+		$tabs="\t\t\t\t";
+		$ehtml=$tabs.'<select name="engine" onchange="clonos.onChangeEngine(this,event);">';
+		$phtml='';
+		$first=true;
+		$not_engines=(count(ClonOS::$engines)==1);
+		foreach(ClonOS::$engines as $key=>$eng)
+		{
+			if($first)$prefix=$eng['prefix'];
+			$ehtml.='<option value="'.$eng['name'].'">'.$eng['description'].'</option>';
+			$class=($first)?'':' class="hidden"';
+			$phtml.=$tabs.'<select name="profile"'.$class.' id="p-'.$key.'" data-prefix="'.$eng['prefix'].'" onchange="clonos.onChangeProfile(this,event);">';
+			foreach($eng['data'] as $pkey=>&$prof)
+			{
+				if(!isset($prof['is_cloud'])) $prof['is_cloud']="0";
+				if(($type=='iso' && $prof['is_cloud']!=1) ||
+					($type=='cloud' && $prof['is_cloud']==1))
+				{
+					$phtml.='<option value="'.$pkey.'" data-jname="'.$prof['default_jailname'].'">'.
+						$prof['long_description'].'</option>';
+				}
+
+			}
+			$phtml.='</select>'.PHP_EOL;
+			$first=false;
+		}
+		$ehtml.='</select>'.PHP_EOL;
+		
+		if($not_engines) $ehtml='';
+		
+		return ['engines'=>$ehtml,'profiles'=>$phtml,'prefix'=>$prefix];
+	}
 }

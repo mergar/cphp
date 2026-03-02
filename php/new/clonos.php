@@ -22,6 +22,7 @@ class ClonOS {
 	const filenameNASDisksList='/var/db/cixnas/api/disks.json';
 	const filenameNASRaidsList='/var/db/cixnas/api/raids.json';
 	const filenameNASEnginesList='/var/db/cixnas/api/raids_engine.json';
+	const filenameCapabilities='/var/db/cixnas/api/capabilities.json';
 	
 	const TRANSLATE_CACHE_DIR='translate.cache';
 	const BACK_FOLDER_NAME='back';
@@ -41,12 +42,15 @@ class ClonOS {
 	public static $media_import;
 	public static $json_name;
 	public static $section;
+	public static $sys;
+	public static $engines;
 	
 	public $json_req;
 	public $sys_vars;
 	public $index_file;
 	public $uri;
 	public $uri1;
+	public $form;
 	
 	
 	public $config;
@@ -64,7 +68,7 @@ class ClonOS {
 		'sstop','projremove','bcreate',
 		'bstart','bstop','brestart',
 		'bremove','bclone','brename',
-		'vm_obtain','removesrc','srcup',
+		'vm_cloud','removesrc','srcup',
 		'removebase','world','repo','forms'
 	];
 	private $_vars=[];
@@ -83,6 +87,17 @@ class ClonOS {
 		self::$realpath_assets=self::$realpath.'assets/';
 		self::$media_import=self::$realpath.'media_import/';
 		
+		$cfg_filename=self::$realpath_php.'_test_cfg.php';
+		if(file_exists($cfg_filename))
+		{
+			include($cfg_filename);
+		}else{
+			die("Not found config file: _test_cfg.php. You need generate it at first.");
+		}
+		
+		include(self::$realpath_php.'_profiles_cfg_auto_multi.php');
+		//echo '<pre>';print_r(self::$engines);exit;
+		
 		if($setup===true) return;
 		
 		self::$workdir=getenv('WORKDIR'); # // /usr/jails
@@ -91,8 +106,16 @@ class ClonOS {
 		
 		$this->_post=($_SERVER['REQUEST_METHOD']=='POST');
 		$this->_vars=$_POST;
+		$this->form=$this->_vars;
 
 		$this->_client_ip=$_SERVER['REMOTE_ADDR'];
+		
+		$p=pathinfo($_SERVER['REQUEST_URI']);
+		if(isset($p['extension']))
+		{
+			header("HTTP/1.1 404 Not Found");
+			exit;
+		}
 		
 		$ures=$this->userAutologin();
 		$this->sys_vars['authorized']=false;
@@ -281,6 +304,24 @@ class ClonOS {
 			echo "Index file not found! file: ".__FILE__.", line: ".__LINE__;
 		}
 	}
+	
+	function getVMCommand($cmd)
+	{
+		$form=$this->_vars['form_data'];
+		$emul=$form['emulator'];
+		$eng=self::$engines;
+		
+		$prefix='b';
+		if(isset($eng[$emul]))
+		{
+			$prefix=$eng[$emul]['prefix'];
+		}
+		
+		$command=$prefix.$cmd;
+		
+		return ['cmd'=>$command];
+	}
+	
 	
 }
 

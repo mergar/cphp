@@ -21,9 +21,8 @@ $hres = $this->getTableChunk('bhyveslist','tbody');
 foreach($nodes as $node){
 	$db1 = new Db('base', $node);
 	if(!$db1->error){
-		$bhyves = $db1->select("SELECT jname,vm_ram,vm_cpus,vm_os_type,hidden,protected,bhyve_vnc_tcp_bind FROM bhyve where hidden!=1 order by jname asc;", []);
+		$bhyves = $db1->select("SELECT bh.jname,bh.vm_ram,bh.vm_cpus,bh.vm_os_type,bh.hidden, bh.protected,bh.bhyve_vnc_tcp_bind,jl.emulator FROM bhyve bh left join jails jl on bh.jname=jl.jname where bh.hidden!=1 order by bh.jname asc;", []);
 		//$allnodes[$node]=$bhyves;
-		$num = $nth & 1;
 		foreach($bhyves as $bhyve){
 			if($hres !== false){
 
@@ -43,6 +42,7 @@ foreach($nodes as $node){
 					$vnc_port_status = 'black';
 				}
 
+				$num = $nth & 1;
 				$vars = [
 					'jname' => $bhyve['jname'],
 					'nth-num' => 'nth'.$num,
@@ -64,7 +64,8 @@ foreach($nodes as $node){
 					'vnc_title' => $this->translate('Open VNC'),
 					'reboot_title' => $this->translate('Restart bhyve'),
 					'vnc_port' => $vnc_port,
-					'vnc_port_status' => $vnc_port_status
+					'vnc_port_status' => $vnc_port_status,
+					'emulator'=>$bhyve['emulator'],
 				];
 
 				$html_tpl=$hres[1];
@@ -79,8 +80,8 @@ foreach($nodes as $node){
 			}
 
 			$bhyve_ids[] = $bhyve['jname'];
+			$nth++;
 		}
-		$nth++;
 	}
 }
 

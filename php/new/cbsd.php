@@ -1,13 +1,13 @@
 <?php
 
-require_once __DIR__ . '../../../../vendor/autoload.php';
+//require_once __DIR__ . '../../../../vendor/autoload.php';
 
-\Sentry\init([
-  'dsn' => 'http://c65113565bd37b2d04714ca80036d536@sentry.convectix.com/2',
-  // Add request headers, cookies and IP address,
-  // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
-  'send_default_pii' => true,
-]);
+//\Sentry\init([
+//  'dsn' => 'http://c65113565bd37b2d04714ca80036d536@sentry.convectix.com/2',
+//  // Add request headers, cookies and IP address,
+//  // see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
+//  'send_default_pii' => true,
+//]);
 
 
 class CBSD extends ClonOS {
@@ -16,9 +16,10 @@ class CBSD extends ClonOS {
 
 
 		// todo: support for /usr/local/www/clonos/php/config-extcmd.php macros/vars
-		$prepend='env NOCOLOR=1 /usr/local/bin/sudo /usr/local/bin/cbsd ';
+		//$prepend='env NOCOLOR=1 /usr/local/bin/sudo /usr/local/bin/cbsd ';
+		$prepend='env NOCOLOR=1 '.Clonos::$sys->sudo.' '.Clonos::$sys->cmd.' ';
 		$defines = array(
-			'{cbsd_loc}' => "/usr/local/bin/cbsd"
+			'{cbsd_loc}' => Clonos::$sys->cmd	//"/usr/local/bin/cbsd"
 		);
 
 		// descriptor_spec:

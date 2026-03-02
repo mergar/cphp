@@ -518,9 +518,11 @@ thead td:first-child, td:first-child {
 	font-size:86%;
 	padding:2px 4px;
 }
+/*
 .tsimple .nth0 + .nth1 td, .tsimple .nth1 + .nth0 td {
 	border-top:2px solid #d1e7f3;	/* #aad1e8; */	/* #79b8cf; */
 }
+*/
 .tsimple tr.sel td {
 	background-color:#fefec0;
 }
@@ -881,7 +883,8 @@ dialog:focus {
 	text-shadow:1px 1px 2px black;
 }
 .buttons .button.hidden,
-.top-button.hidden {
+.top-button.hidden,
+.hidden {
 	display:none;
 }
 .buttons .button.disabled {

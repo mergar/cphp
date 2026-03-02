@@ -1,5 +1,5 @@
 	<tbody>
-		<tr class="#nth-num##desktop##maintenance#" id="#jname#">
+		<tr class="#desktop##maintenance#" id="#jname#" data-emul="#emulator#">	<!-- #nth-num# -->
 			<td class="node">#node#</td>
 			<td class="txtleft jname">#jname#</td>
 			<td class="graph g-#jname# l-cpu,mem"></td>

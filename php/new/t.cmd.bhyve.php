@@ -4,9 +4,10 @@ trait tcBhyve {
 	
 	function ccmd_bhyveClone(){
 		$form=$this->_vars['form_data'];
-
+		
+		$cmd=$this->getVMCommand('clone');
 		$res=CBSD::run(
-			'task owner=%s mode=new {cbsd_loc} bclone checkstate=0 old=%s new=%s',
+			'task owner=%s mode=new {cbsd_loc} '.$cmd['cmd'].' checkstate=0 old=%s new=%s',	//bclone
 			array($this->_user_info['username'], $form['oldBhyve'], $form['vm_name'])
 		);
 
@@ -253,9 +254,10 @@ trait tcBhyve {
 		}
 		//echo $file;exit;
 		file_put_contents($file_name,$file);
-
+		
+		$cmd=$this->getVMCommand('create');
 		$res=CBSD::run(
-			'task owner=%s mode=new {cbsd_loc} bcreate inter=0 jconf=%s',
+			'task owner=%s mode=new {cbsd_loc} '.$cmd['cmd'].' inter=0 jconf=%s',	//bcreate
 			array($this->_user_info['username'], $file_name)
 		);
 
@@ -302,10 +304,10 @@ trait tcBhyve {
 		return array('errorMessage'=>$err,'jail_id'=>$jid,'taskId'=>$taskId,'html'=>$html,'mode'=>$this->mode);
 	}
 
-	function ccmd_bhyveObtain(){
+	function ccmd_bhyveCloud(){
 		$form=$this->_vars['form_data'];
 		$os_types=$this->config->os_types;
-		$os_types_obtain=$this->config->os_types_obtain;
+		$os_types_cloud=$this->config->os_types_obtain;
 		$sel_os=$form['vm_os_profile'];
 		list($os_num,$item_num)=explode('.',$sel_os);
 		if(!isset($os_types[$os_num])) return array('error'=>true,'errorMessage'=>'Error in list of OS types!');
@@ -313,15 +315,15 @@ trait tcBhyve {
 		$os_items=$os_types[$os_num]['items'][$item_num];
 		$os_type=$os_items['type'];
 
-		//echo '<pre>';print_r($os_types_obtain);exit;
+		//echo '<pre>';print_r($os_types_cloud);exit;
 
 		// os select
 		list($one,$two)=explode('.',$sel_os,2);
 
-		if(isset($os_types_obtain[$one])){
-			if(isset($os_types_obtain[$one]['items'][$two])){
-				$os_profile=$os_types_obtain[$one]['items'][$two]['profile'];
-				$os_type=$os_types_obtain[$one]['items'][$two]['type'];
+		if(isset($os_types_cloud[$one])){
+			if(isset($os_types_cloud[$one]['items'][$two])){
+				$os_profile=$os_types_cloud[$one]['items'][$two]['profile'];
+				$os_type=$os_types_cloud[$one]['items'][$two]['type'];
 			}
 		}
 
@@ -346,9 +348,11 @@ trait tcBhyve {
 
 		$user_pw=(!empty($form['user_password']))?' ci_user_pw_user='.$form['user_password'].' ':'';
 
+		$cmd=$this->getVMCommand('create');
 		// olevole: SHELL ESCAPE here - tabs + \r\n
 		$res=CBSD::run( // TODO: THIS SEEMS WRONG pw_user={$form['vm_password']} {$user_pw}vnc_password={$form['vnc_password']}";
-			'task owner=%s mode=new {cbsd_loc} bcreate jname=%s 
+			//bcreate
+			'task owner=%s mode=new {cbsd_loc} '.$cmd['cmd'].' jname=%s 
 			vm_os_profile="%s" imgsize=%s vm_cpus=%s vm_ram=%s vm_os_type=%s mask=%s 
 			ip4_addr=%s ci_ip4_addr=%s ci_gw4=%s ci_user_pubkey="%s" ci_user_pw_user=%s %svnc_password=%s',
 			array(
@@ -410,37 +414,46 @@ trait tcBhyve {
 	}
 
 	function ccmd_bhyveStart(){
+		$cmd=$this->getVMCommand('start');
 		return CBSD::run(
-			'task owner=%s mode=new {cbsd_loc} bstart inter=0 jname=%s',
+			'task owner=%s mode=new {cbsd_loc} '.$cmd['cmd'].' inter=0 jname=%s',	//bstart
 			array($this->_user_info['username'], $this->form['jname'])
 		);	// autoflush=2
 	}
 
 	function ccmd_bhyveStop(){
+		$cmd=$this->getVMCommand('stop');
 		return CBSD::run(
-			'task owner=%s mode=new {cbsd_loc} bstop inter=0 jname=%s',
+			'task owner=%s mode=new {cbsd_loc} '.$cmd['cmd'].' inter=0 jname=%s',	//bstop
 			array($this->_user_info['username'], $this->form['jname'])
 		);	// autoflush=2
 	}
 
 	function ccmd_bhyveRestart(){
+		$cmd=$this->getVMCommand('restart');
 		return CBSD::run(
-			'task owner=%s mode=new {cbsd_loc} brestart inter=0 jname=%s',
+			'task owner=%s mode=new {cbsd_loc} '.$cmd['cmd'].' inter=0 jname=%s',	//brestart
 			array($this->_user_info['username'], $this->form['jname'])
 		);	// autoflush=2
 	}
 
 	function ccmd_bhyveRemove(){
+		$cmd=$this->getVMCommand('remove');
 		return CBSD::run(
-			'task owner=%s mode=new {cbsd_loc} bremove inter=0 jname=%s',
+			'task owner=%s mode=new {cbsd_loc} '.$cmd['cmd'].' inter=0 jname=%s',	//bremove
 			array($this->_user_info['username'], $this->form['jname'])
 		);	// autoflush=2
 	}
 
+	function ccmd_updateBhyveCloud(){
+		$form_items=$this->getBhyveFormItems(cloud:'cloud');
+		return array('form_items'=>$form_items['form_items']);
+	}
+	
 	function ccmd_updateBhyveISO($iso=''){
 //echo $this->config->os_types_getOne('first');exit;
 		$db=new Db('base','storage_media');
-		$res=$db->select("SELECT * FROM media WHERE type='iso'", array());
+		$res=$db->select("SELECT * FROM media WHERE type='iso'", []);
 		
 		if($res===false || empty($res)) return array(); //array('error'=>true,'error_message'=>'Profile ISO is not find!');
 
@@ -462,8 +475,10 @@ trait tcBhyve {
 		}
 		
 		$form_items=$this->getBhyveFormItems();
+		//echo '<pre>';print_r($form_items);exit;
+		//$json=$this->getCapabilities('iso');
 
-		return array('iso_list'=>$html,'form_items'=>$form_items);
+		return array('iso_list'=>$html,'form_items'=>$form_items['form_items']);
 	}
 
 	function getBhyveInfo($jname){
@@ -508,14 +523,76 @@ trait tcBhyve {
 		return array('html'=>$html);
 	}
 
-	function getBhyveFormItems($os_name='',$obtain='')
+	function ccmd_vmOsInfo($cloud='')	//getVMOSListInfo
 	{
+		$jname='...';
+		$arr=$this->config->getOsProfile($this->form,$cloud);
+		//echo '<pre>';print_r($this->form);exit;
+		if($arr===false) return;
+		
+		//echo '<pre>';print_r($this->form);exit;
+		//echo '<pre>';print_r($arr);exit;
+		$jres=$this->ccmd_getFreeJname(false,$arr['default_jailname']);
+		if(!$jres['error'])
+		{
+			$jname=$jres['freejname'];
+		}
+		
+		if(!isset($this->form['cloud'])) $this->form['cloud']='';
+		
+		$res=[
+			'jname'=>$jname,	//$arr['jname'],
+			'imgsize'=>[
+				'min'=>$this->fileSizeConvert((int)$arr['imgsize_min'],only_digits:true),
+				'max'=>$this->fileSizeConvert((int)$arr['imgsize_max'],only_digits:true),
+				'cur'=>@$this->fileSizeConvert((int)$arr['imgsize'],only_digits:true) ?: 1
+			],
+			'vm_cpus'=>[
+				'min'=>intval($arr['vm_cpus_min']),
+				'max'=>intval($arr['vm_cpus_max']),
+				'cur'=>@intval($arr['vm_cpus']) ?: 1
+			],
+			'vm_ram'=>[
+				'min'=>$this->fileSizeConvert((int)$arr['vm_ram_min'],only_digits:true),
+				'max'=>$this->fileSizeConvert((int)$arr['vm_ram_max'],only_digits:true),
+				'cur'=>@$this->fileSizeConvert((int)$arr['vm_ram'],only_digits:true) ?: 1
+			],
+			'cloud'=>$this->form['cloud'],
+		];
+		//echo '<pre>';print_r($this->form);exit;
+		
+		return ['form_items'=>$res,'cloud'=>$this->form['cloud']];
+		
+		return array('form_items'=>$this->getBhyveFormItems($this->form['vmOsProfile']));
+	}
+
+	function ccmd_getCloudFormItems($os_name='')
+	{
+		return $this->ccmd_vmOsInfo('cloud');
+		
+		$res=array('form_items'=>$this->getBhyveFormItems($os_name,'cloud'));
+		return $res;
+	}
+
+	function getBhyveFormItems($os_name='',$cloud='')
+	{
+		return $this->ccmd_vmOsInfo($cloud);
+		
+		
+		
+		if(!isset($this->form))
+		{
+			echo 'no form data';
+		}
+		exit;
+		
+		
 		$jname='undefined';
 		if($os_name!='')
 		{
-			$arr=$this->config->os_types_getOne($os_name,$obtain);
+			$arr=$this->config->os_types_getOne($os_name,$cloud);
 		}else{
-			$arr=$this->config->os_types_getOne('first',$obtain);
+			$arr=$this->config->os_types_getOne('first',$cloud);
 		}
 
 		$jres=$this->ccmd_getFreeJname(false,$arr['default_jname']);
@@ -541,7 +618,7 @@ trait tcBhyve {
 				'max'=>intval($arr['vm_ram_max']),
 				'cur'=>intval($arr['vm_ram'])
 			),
-			'obtain'=>$obtain,
+			'cloud'=>$cloud,
 		);
 
 		return $res;
@@ -595,5 +672,7 @@ trait tcBhyve {
 
 		return $html;
 	}
+
+
 
 }

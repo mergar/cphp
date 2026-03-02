@@ -10,7 +10,7 @@ require_once($_real_path_php.'clonos.php');
 $clonos=new ClonOS($_real_path,true);
 if($run_mode=='cli')
 {
-	$clonos->setup();
+	$clonos->config_generate();
 }else{
 	$clonos->start();
 }

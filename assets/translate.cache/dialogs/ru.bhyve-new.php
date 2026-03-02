@@ -6,6 +6,7 @@ err_messages.add({
 });
 <?php
 //print_r($this->config->os_types);exit;
+$engines=$this->config->getEnginesList('iso');
 ?>
 </script>
 <dialog id="bhyve-new" class="window-box">
@@ -17,10 +18,13 @@ err_messages.add({
 	<form class="win" method="post" id="bhyveSettings" onsubmit="return false;">
 		<div class="window-content">
 			<p class="new">
-				<span class="field-name"><span id="trlt-99">VM OS profile</span>:</span>
-				<select name="vm_os_profile" onchange="clonos.onChangeOsProfile(this,event);">
-					<?php echo $this->config->os_types_create(); ?>
-				</select>
+<?php if($engines['engines']!='') { ?>
+				<span class="field-name"><span id="trlt-99">VM Engine</span>:</span>
+<?php echo $engines['engines']; ?>
+				<br /><br />
+<?php } ?>
+				<span class="field-name">VM Profile:</span>
+<?php echo $engines['profiles']; ?>
 			</p>
 			<p>
 				<span class="field-name"><span id="trlt-98">Virtual Machine name</span>:</span>

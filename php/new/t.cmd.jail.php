@@ -370,7 +370,7 @@ trait tcJail {
 		return array('html'=>$html);
 	}
 
-	function jailAdd($redirect=''){	//$mode='jailAdd'
+	function ccmd_jailAdd($redirect=''){	//$mode='jailAdd'
 		//if(!empty($arr)) $form=$arr; else
 		$form=$this->form;
 		$helper=preg_replace('/^#/','',$this->_vars['hash']);
@@ -435,7 +435,7 @@ trait tcJail {
 
 		$err=array();
 		$arr=array(
-			'workdir'=>$this->workdir,
+			'workdir'=>self::$workdir,
 			'mount_devfs'=>1,
 			'arch'=>'native',
 			'mkhostfile'=>1,
@@ -478,7 +478,7 @@ trait tcJail {
 		/* create jail */
 		$file_name='/tmp/'.$arr['jname'].'.conf';
 
-		$file=file_get_contents($this->realpath_public.'templates/jail.tpl');
+		$file=file_get_contents(self::$realpath_public.'templates/jail.tpl');
 		if(!empty($file)) {
 			foreach($arr as $var=>$val){
 				$file=str_replace('#'.$var.'#',$val,$file);
@@ -487,7 +487,6 @@ trait tcJail {
 		file_put_contents($file_name,$file);
 
 		$username=$this->_user_info['username'];
-
 		//$cbsd_queue_name='/clonos/'.trim($this->_vars['path'],'/').'/';
 		$res=CBSD::run('task owner=%s mode=new {cbsd_loc} jcreate inter=0 jconf=%s', array($username, $file_name));
 		//.' cbsd_queue_name='.$cbsd_queue_name);
@@ -498,7 +497,7 @@ trait tcJail {
 			$err='Jail was created!';
 			$taskId=$res['message'];
 		}
-
+var_dump($res);exit;
 		// local - change to the real server on which the jail was created!
 		$jid=$arr['jname'];
 

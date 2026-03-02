@@ -39,11 +39,11 @@ trait tCommands {
 		switch($form['type'])
 		{
 			case 'dialog':
-				$cache_file_name=$this->realpath_dialogs.self::TRANSLATE_CACHE_DIR.
+				$cache_file_name=self::$realpath_dialogs.self::TRANSLATE_CACHE_DIR.
 					DIRECTORY_SEPARATOR.$lang.'.'.$form['dialog'].'.php';
 				break;
 			case 'pages':
-				$cache_file_name=$this->realpath_page.self::TRANSLATE_CACHE_DIR.
+				$cache_file_name=self::$realpath_page.self::TRANSLATE_CACHE_DIR.
 					DIRECTORY_SEPARATOR.$lang.'.index.php';
 				break;
 			default:
@@ -530,18 +530,6 @@ trait tCommands {
 		return $arr;
 	}
 
-	function ccmd_vmOsInfo()	//getVMOSListInfo
-	{
-		return array('form_items'=>$this->getBhyveFormItems($this->form['vmOsProfile'],$this->form['obtain']));
-	}
-
-	function ccmd_getObtainFormItems($os_name='')
-	{
-		$res=array('form_items'=>$this->getBhyveFormItems($os_name,'obtain'));
-		return $res;
-	}
-
-
 	function ccmd_vmTemplateAdd(){
 		$db=new Db('base','local');
 		if(!$db->isConnected()) return $this->messageError('data incorrect!'); //array('error'=>true,'error_message'=>'data incorrect!');
@@ -797,7 +785,7 @@ trait tCommands {
 	}
 
 	function get_node_info($nodename,$value){
-		$db = new Db('', '', $this->realpath."/var/db/nodes.sqlite"); 
+		$db = new Db('', '', self::$realpath."/var/db/nodes.sqlite"); 
 		if (!$db->isConnected()) return array('error'=>true,'res'=> $db->error_message);
 
 		$result = $db->select("SELECT ? FROM nodelist WHERE nodename=?", array([$value],[$nodename]));
@@ -1192,10 +1180,11 @@ trait tCommands {
 		return round($Hz/$h,2).' '.$l;
 	}
 
-	function fileSizeConvert(int $bytes,$bytes_in_mb=1024,$round=false,$small=false){
+	//function fileSizeConvert(int $bytes,$bytes_in_mb=1024,$round=false,$small=false,only_digits=false){
+	function fileSizeConvert(int $bytes,$bytes_in_mb=1024,$round=false,$small=false,$only_digits=false){
 		//$bytes = intval($bytes);
 		//var_dump($bytes);exit;
-
+		
 		$arBytes = array(
 			0 => array(
 				"UNIT" => "tb",
@@ -1219,12 +1208,15 @@ trait tCommands {
 			),
 		);
 
-		$result='0 MB';
+		$result=0;
 		foreach($arBytes as $arItem){
 			if($bytes >= $arItem["VALUE"]){
 				$result = $bytes / $arItem["VALUE"];
 				if($round) $result=round($result);
-				$result = str_replace(".", "," , strval(round($result, 2))).($small?strtolower(substr($arItem['UNIT'],0,1)):" ".strtoupper($arItem["UNIT"]));
+				if(!$only_digits)
+				{
+					$result = str_replace(".", "," , strval(round($result, 2))).($small?strtolower(substr($arItem['UNIT'],0,1)):" ".strtoupper($arItem["UNIT"]));
+				}
 				break;
 			}
 		}
@@ -1358,6 +1350,51 @@ trait tCommands {
 		if(!empty($res)) $val=$res[1];
 		return $val;
 	}
-
+	
+	function getCapabilities($src) {
+		switch($src)
+		{
+			case 'iso':break;
+			case 'cloud':break;
+			default:
+				return $this->messageError('src «'.$src.'» not found');
+				//return ['error'=>true,'error_message'=>'src «'.$src.'» not found'];
+				exit;
+				break;
+		}
+		$this->cacheVMProfiles();
+		#$res=json_decode(file_get_contents(self::$realpath_php.'_profiles_cfg.php'),true);
+		#echo '<pre>';print_r($res);
+/*
+		if(file_exists(self::filenameCapabilities)){
+			$jsonTxt=file_get_contents(self::filenameCapabilities);
+			try {
+				$json=json_decode($jsonTxt,true);
+				foreach($json as $key=>&$val)
+				{
+					if(!$val['available']){ unset($json[$key]); }
+					else{
+						unset($val['info']);
+						$res=CBSD::run(
+							'get-profiles src=iso emulator=%s json=1',[$val['name']]
+						);
+						$val['profiles']=$res['message'];
+					}
+				}
+				
+				foreach($json as $key=>$val)
+				{
+					$json[$val['name']]=$val;
+					unset($json[$key]);
+				}
+				
+#				echo '<pre>';print_r($json);
+#				exit;
+			}catch(Exception $e){
+				$error_message=$e->getMessage();
+			}
+		}
+*/
+	}
 
 }
