@@ -308,7 +308,12 @@ class ClonOS {
 	function getVMCommand($cmd)
 	{
 		$form=$this->_vars['form_data'];
-		$emul=$form['emulator'];
+		if(isset($form['engine']))
+		{
+			$emul=$form['engine'];	//emulator
+		}else{
+			$emul='bhyve';
+		}
 		$eng=self::$engines;
 		
 		$prefix='b';

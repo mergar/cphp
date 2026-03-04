@@ -27,7 +27,7 @@ $databases = array(
 		'name'=> 'ClonOS DB'
 	),
 	array(
-		'path'=> '/usr/jails/var/db/local.sqlite',
+		'path'=> '/zmirror/jails/var/db/local.sqlite',
 		'name'=> 'CBSD Global DB'
 	),
 );

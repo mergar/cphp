@@ -31,7 +31,7 @@ foreach($nodes as $node){
 	$db1 = new Db('base', $node);
 	if(!$db1->error){
 
-		$jails = $db1->select("SELECT jname,ip4_addr,status,protected FROM jails WHERE emulator!='bhyve' and hidden!=1 order by jname asc;", []);
+		$jails = $db1->select("SELECT jname,ip4_addr,status,protected FROM jails WHERE emulator='jail' and hidden!=1 order by jname asc;", []);
 		$allnodes[$node] = $jails;
 		$num = $nth & 1;
 

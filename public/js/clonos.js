@@ -1440,11 +1440,12 @@ var clonos={
 	},
 	onJailStart:function(){},
 	
-	jailRestart:function(id,opt)
+	jailRestart:function(obj,opt)
 	{
 		if(typeof opt=='undefined') opt='jail';
 		var op='jrestart';
 		var txt='jail';
+		var id=$(obj).attr('id');
 		if(opt=='bhyve'){op='brestart';txt='virtual machine';}
 		var c=confirm(this.translate('You want to restart selected '+txt+'! Are you sure?'));
 		if(!c) return;
@@ -1461,11 +1462,12 @@ var clonos={
 		//this.tasks.add({'operation':op,'jail_id':id});	//'jrestart'
 		//this.tasks.start();
 	},
-	jailRemove:function(id,opt)
+	jailRemove:function(obj,opt)
 	{
 		if(typeof opt=='undefined') opt='jail';
 		var op='jremove';
 		var txt='jail';
+		var id=$(obj).attr('id');
 		if(opt=='bhyve'){op='bremove';txt='virtual machine';}
 		var name=$('#'+id+' td.jname').html();
 		if(this.removeConfirm(id,'You want to delete selected '+txt+': «'+name+'»! Are you sure?')===false) return;
@@ -1473,7 +1475,8 @@ var clonos={
 		//if(!c) return;
 		this.enableWait(id);
 		// ---
-		var posts=[{'name':'operation','value':op},{'name':'jname','value':id}];
+		var emul=$(obj).data('emul');
+		var posts={'operation':op,'jname':id,'emulator':emul};
 		if(typeof this.commands[op]!='undefined')
 		{
 			this.loadData(this.commands[op]['cmd'],$.proxy(this.onJailStart,this),posts,false);
@@ -2155,7 +2158,7 @@ var clonos={
 				}
 				if(tblid=='jailslist' || tblid=='bhyveslist')
 				{
-					this.jailRemove(trid,opt);
+					this.jailRemove(tr,opt);	//trid
 					return;
 				}
 				if(tblid=='packageslist')
@@ -2181,7 +2184,7 @@ var clonos={
 					this.srcUpdate(trid);
 					return;
 				}
-				this.jailRestart(trid,opt);
+				this.jailRestart(tr,opt);	//trid
 				return;break;
 			case 'icon-desktop':
 				$('.vnc-wait').show();

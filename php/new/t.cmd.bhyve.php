@@ -192,13 +192,24 @@ trait tcBhyve {
 
 	function ccmd_bhyveAdd(){
 		$form=$this->form;
-
-		$os_types=$this->config->os_types;
-		$sel_os=$form['vm_os_profile'];
-		list($os_num,$item_num)=explode('.',$sel_os);
-		if(!isset($os_types[$os_num])) return array('error'=>true,'errorMessage'=>'Error in list of OS types!');
-		$os_name=$os_types[$os_num]['os'];
-		$os_items=$os_types[$os_num]['items'][$item_num];
+		
+		if(isset($form['engine']) && isset($form['profile']))
+		{
+			$emulator=self::$engines[$form['engine']]['name'];
+			$os=self::$engines[$form['engine']]['data'][$form['profile']];
+			$profile=$os['vm_profile'];
+			$os_type=$os['vm_os_type'];
+		}else{
+			return ['error'=>true,'errorMessage'=>'Engine or profile VM is not found!'];
+		}
+		
+//echo '<pre>';print_r($emulator);exit;
+//		$os_types=$this->config->os_types;
+//		$sel_os=$form['vm_os_profile'];
+//		list($os_num,$item_num)=explode('.',$sel_os);
+//		if(!isset($os_types[$os_num])) return array('error'=>true,'errorMessage'=>'Error in list of OS types!');
+//		$os_name=$os_types[$os_num]['os'];
+//		$os_items=$os_types[$os_num]['items'][$item_num];
 
 		$err=array();
 		$arr=array(
@@ -213,13 +224,14 @@ trait tcBhyve {
 			'vm_size'=>$form['vm_imgsize']*1024*1024*1024,
 			'vm_cpus'=>$form['vm_cpus'],
 			'vm_ram'=>$form['vm_ram']*1024*1024*1024,
-			'vm_os_type'=>$os_items['type'],
+			'vm_os_type'=>$os_type,	//$os_items['type'],
 			'vm_efi'=>'uefi',
-			'vm_os_profile'=>$os_items['profile'],
+			'vm_os_profile'=>$profile,	//$os_items['profile'],
 			'vm_guestfs'=>'',
 			'bhyve_vnc_tcp_bind'=>$form['bhyve_vnc_tcp_bind'],
 			'vm_vnc_port'=>$form['vm_vnc_port'],
 			'vm_vnc_password'=>$form['vm_vnc_password'],
+			'emulator'=>$emulator,
 		);
 		
 		$iso=true;
@@ -248,7 +260,7 @@ trait tcBhyve {
 		/* create vm */
 		$file_name='/tmp/'.$arr['jname'].'.conf';
 
-		$file=file_get_contents($this->realpath_public.'templates/vm.tpl');
+		$file=file_get_contents(self::$realpath_public.'templates/vm.tpl');
 		if(!empty($file)){
 			foreach($arr as $var=>$val) $file=str_replace('#'.$var.'#',$val,$file);
 		}
@@ -283,7 +295,7 @@ trait tcBhyve {
 				'vm_status'=>$this->translate('Creating'),
 				'vm_cpus'=>$form['vm_cpus'],
 				'vm_ram'=>$vm_ram,
-				'vm_os_type'=>$os_items['type'],	//$os_name,
+				'vm_os_type'=>$os_type,	//$os_items['type'],	//$os_name,
 				'vnc_port'=>'',
 				'vnc_port_status'=>'',
 				'icon'=>'spin6 animate-spin',
@@ -293,6 +305,7 @@ trait tcBhyve {
 				'protitle'=>$this->translate('Delete'),
 				'vnc_title'=>$this->translate('Open VNC'),
 				'reboot_title'=>$this->translate('Restart VM'),
+				'emulator'=>$emulator,
 			);
 			
 			foreach($vars as $var=>$val){
@@ -300,12 +313,13 @@ trait tcBhyve {
 			}
 			$html=$html_tpl;
 		}
-		
+		//echo '<pre>';print_r($html);exit;
 		return array('errorMessage'=>$err,'jail_id'=>$jid,'taskId'=>$taskId,'html'=>$html,'mode'=>$this->mode);
 	}
 
 	function ccmd_bhyveCloud(){
 		$form=$this->_vars['form_data'];
+		
 		$os_types=$this->config->os_types;
 		$os_types_cloud=$this->config->os_types_obtain;
 		$sel_os=$form['vm_os_profile'];

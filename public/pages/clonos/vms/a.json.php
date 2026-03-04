@@ -21,7 +21,30 @@ $hres = $this->getTableChunk('bhyveslist','tbody');
 foreach($nodes as $node){
 	$db1 = new Db('base', $node);
 	if(!$db1->error){
+		/*
 		$bhyves = $db1->select("SELECT bh.jname,bh.vm_ram,bh.vm_cpus,bh.vm_os_type,bh.hidden, bh.protected,bh.bhyve_vnc_tcp_bind,jl.emulator FROM bhyve bh left join jails jl on bh.jname=jl.jname where bh.hidden!=1 order by bh.jname asc;", []);
+		*/
+		/*
+			select j.jname, j.emulator, b.vm_ram bram, q.vm_ram qram from jails j
+			left join
+			bhyve b on b.jname=j.jname
+			left join
+			qemu q on q.jname=j.jname
+			where emulator!='jail'
+			order by j.jname asc
+		*/
+		$bhyves = $db1->select("select j.jname, j.emulator, j.protected, j.hidden,
+			COALESCE(q.vm_ram, x.vm_ram, b.vm_ram) AS vm_ram,
+			COALESCE(q.vm_cpus, x.vm_cpus, b.vm_cpus) AS vm_cpus,
+			b.bhyve_vnc_tcp_bind, b.vm_os_type
+			FROM jails j
+				LEFT JOIN qemu q ON j.jname = q.jname AND j.emulator = 'qemu'
+				LEFT JOIN xen x ON j.jname = x.jname AND j.emulator = 'xen'
+				LEFT JOIN bhyve b ON j.jname = b.jname AND j.emulator = 'bhyve'
+			where j.emulator!='jail' order by j.jname asc",[]);
+		
+		//echo '<pre>';print_r($bhyves);exit;
+		
 		//$allnodes[$node]=$bhyves;
 		foreach($bhyves as $bhyve){
 			if($hres !== false){
@@ -71,7 +94,7 @@ foreach($nodes as $node){
 				$html_tpl=$hres[1];
 
 				foreach($vars as $var => $val){
-					$html_tpl = str_replace('#'.$var.'#', $val, $html_tpl);
+					$html_tpl = str_replace('#'.$var.'#', $val ?? '', $html_tpl);
 				}
 				if($node != 'local'){
 					$html_tpl = str_replace('<span class="icon-cog"></span>', '', $html_tpl);

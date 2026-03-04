@@ -2,6 +2,8 @@ upstream ttyd_back {
 	server unix:/var/run/ttyd.sock;
 }
 
+include ttyd-streams-enabled/*.conf;
+
 server {
 	listen *:80;
 
@@ -33,6 +35,8 @@ server {
 		proxy_set_header      Upgrade $http_upgrade;
 		proxy_set_header      Connection "upgrade";
 	}
+
+	include ttyd-locations-enabled/*.conf;
 
 	location ~ \.php$ {
 		root          /usr/local/www/clonos/public;

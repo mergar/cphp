@@ -86,7 +86,7 @@ class Db extends ClonOS {
 	}
 
 	# TODO once tested $values can have a default value of an empty array
-	function select($sql, $values, $single = false){
+	function select($sql, $values=[], $single = false){
 		$sql=str_replace('"',"'",$sql);
 		if ($this->error){
 			return array('error' => $this->error, 'info' => $this->error_message);
@@ -115,7 +115,7 @@ class Db extends ClonOS {
 		}
 	}
 
-	function selectOne($sql, $values){
+	function selectOne($sql, $values=[]){
 		return $this->select($sql, $values, true);
 	}
 

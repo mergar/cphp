@@ -1,8 +1,8 @@
 <?php
 $this->useDialogs(array(
 	'vnc-bhyve',
-	'bhyve-new',
-	'bhyve-obtain',
+	'bhyve-iso',
+	'bhyve-cloud',
 	'bhyve-clone',
 	'bhyve-rename',
 	'jail-settings-config-menu',
@@ -11,8 +11,8 @@ $this->useDialogs(array(
 <h1><span id="trlt-12">Bhyve VMs</span></h1>
 
 <p>
-	<span class="top-button icon-plus id:bhyve-new"><span id="trlt-234">Create from ISO</span></span>
-	<span class="top-button icon-plus id:bhyve-obtain"><span id="trlt-235">Cloud images</span></span>
+	<span class="top-button icon-plus id:bhyve-iso"><span id="trlt-234">Create from ISO</span></span>
+	<span class="top-button icon-plus id:bhyve-cloud"><span id="trlt-235">Cloud images</span></span>
 </p>
 
 <table class="tsimple" id="bhyveslist" width="100%">
