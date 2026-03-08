@@ -13,3 +13,4 @@ _translate.cache
 media_import
 __pycache__
 vendor
+assets/translate.cache
