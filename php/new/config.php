@@ -437,6 +437,7 @@ class Config extends ClonOS
 			if(!isset($vars[$key]))
 				$vars[$key]=$eng[$key];
 		}
+		
 		return $vars;
 	}
 	
@@ -458,17 +459,38 @@ class Config extends ClonOS
 			$ehtml.='<option value="'.$eng['name'].'">'.$eng['description'].'</option>';
 			$class=($first)?'':' class="hidden"';
 			$phtml.=$tabs.'<select name="profile"'.$class.' id="p-'.$key.'" data-prefix="'.$eng['prefix'].'" onchange="clonos.onChangeProfile(this,event);">';
-			foreach($eng['data'] as $pkey=>&$prof)
-			{
-				if(!isset($prof['is_cloud'])) $prof['is_cloud']="0";
-				if(($type=='iso' && $prof['is_cloud']!=1) ||
-					($type=='cloud' && $prof['is_cloud']==1))
-				{
-					$phtml.='<option value="'.$pkey.'" data-jname="'.$prof['default_jailname'].'">'.
-						$prof['long_description'].'</option>';
-				}
+			
+			$arr=$eng['data'];
+			$new_arr=[];
+			$res=array_multisort(array_column($arr,'long_description'),SORT_ASC,SORT_NATURAL,$arr);
 
+			foreach($arr as $key=>$val)
+			{
+				$os=$this->os_types_names[$arr[$key]['vm_os_type']];	// ?? 'Unknown';
+				$new_arr[$os][$key]=$val;
 			}
+
+			foreach($new_arr as $os=>$arr)
+			{
+				//echo '<pre>';print_r($arr);exit;
+				//echo 'count: '.count($arr).'<br>';
+				//if(count($arr)==1){echo '<pre>';print_r($arr);exit;}
+				$phtml1='<optgroup label="'.$os.'">'.PHP_EOL;
+				$count=0;
+				foreach($new_arr[$os] as $pkey=>&$prof)
+				{
+					if(!isset($prof['is_cloud'])) $prof['is_cloud']="0";
+					if(($type=='iso' && $prof['is_cloud']!=1) ||
+						($type=='cloud' && $prof['is_cloud']==1))
+					{
+						$phtml1.='<option value="'.$pkey.'" data-jname="'.$prof['default_jailname'].'">'.
+							$prof['long_description'].'</option>';
+						$count++;
+					}
+				}
+				if($count>0) $phtml.=$phtml1.'</optgroup>'.PHP_EOL;
+			}
+
 			$phtml.='</select>'.PHP_EOL;
 			$first=false;
 		}
@@ -477,5 +499,75 @@ class Config extends ClonOS
 		if($not_engines) $ehtml='';
 		
 		return ['engines'=>$ehtml,'profiles'=>$phtml,'prefix'=>$prefix];
+	}
+	
+	function getEnginesCombo($type='iso')
+	{
+		ob_start();
+		echo '<label for="oslist">Выберите профиль:</label><input list="ositems" name="oslist" id="oslist" placeholder="Начните вводить..." style="width:260px"><datalist id="ositems">';
+		
+		$key='bhyve';
+		$eng=ClonOS::$engines[$key];
+//		foreach(ClonOS::$engines as $key=>$eng)
+//		{
+			$arr=$eng['data'];
+			$new_arr=[];
+			$res=array_multisort(array_column($arr,'long_description'),SORT_ASC,SORT_NATURAL,$arr);
+			foreach($arr as $key=>$val)
+			{
+				$os=$this->os_types_names[$arr[$key]['vm_os_type']];	// ?? 'Unknown';
+				$new_arr[$os][$key]=$val;
+			}
+			//echo '<pre>';print_r($new_arr);exit;
+			
+			foreach($new_arr as $os=>$arr)
+			{
+				//$phtml1='<optgroup label="'.$os.'">'.PHP_EOL;
+				echo '<optgroup label="'.$os.'">'.PHP_EOL;
+				$count=0;
+				foreach($arr as $pkey=>&$prof)
+				{
+					echo '<option value="'.$prof['long_description'].'" data-jname="'.$prof['default_jailname'].'">'.$prof['long_description'].'</option>';
+					echo PHP_EOL;
+					$count++;
+/*
+					if(!isset($prof['is_cloud'])) $prof['is_cloud']="0";
+					if(($type=='iso' && $prof['is_cloud']!=1) ||
+						($type=='cloud' && $prof['is_cloud']==1))
+					{
+						$phtml1.='<option value="'.$prof['long_description'].'" data-jname="'.$prof['default_jailname'].'">'.$prof['long_description'].'</option>';
+						$count++;
+					}
+*/
+				}
+				//$phtml.='</optgroup>'.PHP_EOL;
+				echo '</optgroup>'.PHP_EOL;
+				//if($count>0) $phtml.=$phtml1.'</optgroup>'.PHP_EOL;
+			}
+/*
+			foreach($new_arr as $os=>$arr)
+			{
+				$phtml1='<optgroup label="'.$os.'">'.PHP_EOL;
+				$count=0;
+				foreach($new_arr[$os] as $pkey=>&$prof)
+				{
+					if(!isset($prof['is_cloud'])) $prof['is_cloud']="0";
+					if(($type=='iso' && $prof['is_cloud']!=1) ||
+						($type=='cloud' && $prof['is_cloud']==1))
+					{
+						$phtml1.='<option value="'.$prof['long_description'].'" data-jname="'.$prof['default_jailname'].'">'.$prof['long_description'].'</option>';
+						$count++;
+					}
+				}
+				if($count>0) $phtml.=$phtml1.'</optgroup>'.PHP_EOL;
+			}
+*/
+//		}
+		echo '</datalist>'.PHP_EOL;
+		
+		$html = ob_get_contents();
+		ob_end_clean();
+		
+		return $html;
 	}
 }

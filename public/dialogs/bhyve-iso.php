@@ -17,6 +17,26 @@ $engines=$this->config->getEnginesList('iso');
 	<h2><translate id="97">Virtual Machine Settings</translate></h2>
 	<form class="win" method="post" id="bhyveSettings" onsubmit="return false;">
 		<div class="window-content">
+			<p>
+<?php echo $this->config->getEnginesCombo(); ?>
+			</p>
+		<!--
+			<p>
+				<label for="browser">Выберите браузер:</label>
+				<input list="browsers" name="browser" id="browser" placeholder="Начните вводить...">
+
+				<datalist id="browsers">
+				<optgroup label="test">
+				  <option value="Chrome">
+				  <option value="Firefox">
+				</optgroup>
+				  <option value="Safari">
+				  <option value="Edge">
+				  <option value="Opera">
+				  <option value="Яндекс Браузер">
+				</datalist>
+			</p>
+		-->
 			<p class="new">
 <?php if($engines['engines']!='') { ?>
 				<span class="field-name"><translate id="99">VM Engine</translate>:</span>
