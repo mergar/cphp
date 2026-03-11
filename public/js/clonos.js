@@ -450,7 +450,7 @@ var clonos={
 		
 		var dialog=$(btn).parents('dialog');
 		$(dialog).toggleClass('fullscreen');
-		if(!$(dialog).hasClass('fullscreen'))
+		//if(!$(dialog).hasClass('fullscreen'))
 			this.dialogSetPosition(dialog);
 	},
 	dialogClose:function(dname)
@@ -459,6 +459,11 @@ var clonos={
 		for(var n=0,nl=dialogs.length;n<nl;n++)
 		{
 			var dialog=dialogs[n];
+			var id=$(dialog).attr('id');
+			if(id=='vnc' && dialog.open)
+			{
+				$('#vnc-iframe').attr('src','about:blank');
+			}
 			if(typeof dname=='undefined' || typeof dname!='undefined' && dname==$(dialog).attr('id'))
 			{
 				/*

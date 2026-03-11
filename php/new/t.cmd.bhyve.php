@@ -542,6 +542,7 @@ trait tcBhyve {
 		$jname='...';
 		$arr=$this->config->getOsProfile($this->form,$cloud);
 		//echo '<pre>';print_r($this->form);exit;
+		//echo '<pre>';print_r($arr);exit;
 		if($arr===false) return;
 		
 		//echo '<pre>';print_r($this->form);exit;

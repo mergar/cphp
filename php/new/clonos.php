@@ -96,6 +96,13 @@ class ClonOS {
 		}
 		
 		include(self::$realpath_php.'_profiles_cfg_auto_multi.php');
+		if(!empty(ClonOS::$engines))
+		{
+			foreach(ClonOS::$engines as $key=>&$eng)
+			{
+				array_multisort(array_column($eng['data'],'long_description'),SORT_ASC,SORT_NATURAL,$eng['data']);
+			}
+		}
 		//echo '<pre>';print_r(self::$engines);exit;
 		
 		if($setup===true) return;

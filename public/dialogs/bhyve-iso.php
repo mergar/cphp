@@ -17,9 +17,11 @@ $engines=$this->config->getEnginesList('iso');
 	<h2><translate id="97">Virtual Machine Settings</translate></h2>
 	<form class="win" method="post" id="bhyveSettings" onsubmit="return false;">
 		<div class="window-content">
+<!--
 			<p>
-<?php echo $this->config->getEnginesCombo(); ?>
+<?php // echo $this->config->getEnginesCombo(); ?>
 			</p>
+-->
 		<!--
 			<p>
 				<label for="browser">Выберите браузер:</label>

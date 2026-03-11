@@ -430,6 +430,7 @@ class Config extends ClonOS
 			$eng=array_first(ClonOS::$engines);
 			$vars=$eng['data'][$profile];
 		}
+		//echo '<pre>';print_r([$profile,$engine,$vars,ClonOS::$engines[$engine]]);exit;
 		
 		$keys=['vm_cpus_min','vm_cpus_max','imgsize_min','imgsize_max','vm_ram_min','vm_ram_max'];
 		foreach($keys as $key)
@@ -462,7 +463,7 @@ class Config extends ClonOS
 			
 			$arr=$eng['data'];
 			$new_arr=[];
-			$res=array_multisort(array_column($arr,'long_description'),SORT_ASC,SORT_NATURAL,$arr);
+			//$res=array_multisort(array_column($arr,'long_description'),SORT_ASC,SORT_NATURAL,$arr);
 
 			foreach($arr as $key=>$val)
 			{
@@ -512,7 +513,7 @@ class Config extends ClonOS
 //		{
 			$arr=$eng['data'];
 			$new_arr=[];
-			$res=array_multisort(array_column($arr,'long_description'),SORT_ASC,SORT_NATURAL,$arr);
+			//$res=array_multisort(array_column($arr,'long_description'),SORT_ASC,SORT_NATURAL,$arr);
 			foreach($arr as $key=>$val)
 			{
 				$os=$this->os_types_names[$arr[$key]['vm_os_type']];	// ?? 'Unknown';

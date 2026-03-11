@@ -20,7 +20,8 @@ function runVNC($jname)
 
 //	clonos_syslog("vnc.php run: vm_vncwss jname={$jname} permit={$permit}");
 
-	$res=CBSD::run("vm_vncwss jname={$jname} permit={$permit}",array());
+	//$res=CBSD::run("vm_vncwss jname={$jname} permit={$permit}",array());
+	
 //	, array($jname, $_SERVER['REMOTE_ADDR']));
 
 	// HTTP_HOST is preferred for href
@@ -31,6 +32,18 @@ function runVNC($jname)
 		# use localhost as fallback in case the HTTP_HOST header is not set
 		$nodeip = '127.0.0.1';
 	}
+	
+	$res=CBSD::run("ttydterm jname={$jname} ip={$permit}",[]);	//{$REMOTE_ADDR}
+	if($res['retval']==0)
+	{
+		http://<SERVER_NAME>/jailshell/
+		header('Location: /jailshell/');
+		exit;
+	}else{
+		echo "Error on VNC";
+		exit;
+	}
+	echo '<pre>';print_r($res);exit;
 
 	// HTTP_HOST is IP, try to check SERVER_NAME
 	if (filter_var($nodeip, FILTER_VALIDATE_IP)) {
